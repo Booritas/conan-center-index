@@ -1380,6 +1380,7 @@ class OpenCVConan(ConanFile):
         tc.variables["BUILD_opencv_python_bindings_g"] = False
         tc.variables["BUILD_opencv_python_tests"] = False
         tc.variables["BUILD_opencv_ts"] = False
+        tc.variables["INSTALL_TESTS"] = False
 
         tc.variables["WITH_1394"] = False
         tc.variables["WITH_ARAVIS"] = False

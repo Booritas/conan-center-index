@@ -52,6 +52,9 @@ patches:
     - patch_file: "patches/4.1.2-0007-android-install-layout.patch"
       patch_description: "Honor install layout from conan if Android"
       patch_type: "conan"
+    - patch_file: "patches/4.10.0-0001-fix-hiighui-without-image-codecs.patch"
+      patch_description: "Fix hiighui without image codecs"
+      patch_type: "conan"
   "4.9.0":
     - patch_file: "patches/4.5.5-0001-find-openexr.patch"
       patch_description: "Robust discovery & injection of OpenEXR"

@@ -1,0 +1,10 @@
+--- a/modules/highgui/src/window_w32.cpp
++++ b/modules/highgui/src/window_w32.cpp
+@@ -2191,7 +2191,6 @@ static void showSaveDialog(CvWindow& window)
+     }
+ #else
+     CV_UNUSED(window);
+-    CV_LOG_WARNING("Save dialog requires enabled 'imgcodecs' module.");
+     return;
+ #endif
+ }
