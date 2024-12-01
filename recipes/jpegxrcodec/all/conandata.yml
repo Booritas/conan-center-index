@@ -1,0 +1,4 @@
+sources:
+  "1.0.3":
+    - url: "https://github.com/Booritas/jpegxrcodec.git"
+      tag: "v1.0.3"
