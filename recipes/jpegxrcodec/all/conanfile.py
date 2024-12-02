@@ -4,7 +4,16 @@ from conan.tools.gnu import AutotoolsToolchain, AutotoolsDeps
 from conan.tools.microsoft import unix_path, VCVars, is_msvc
 from conan.errors import ConanInvalidConfiguration
 from conan.errors import ConanException
+from conan.tools.files import apply_conandata_patches, collect_libs, copy, export_conandata_patches, get, rename, replace_in_file, rmdir, save
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.scm import Git
+import os
 
+def find_file_recursively(folder, filename):
+    for root, dirs, files in os.walk(folder):
+        if filename in files:
+            return os.path.join(root, filename)
+    return None
 
 class JxrlibConan(ConanFile):
     name = "jpegxrcodec"
@@ -12,45 +21,55 @@ class JxrlibConan(ConanFile):
     version = "1.0.3"
     description = "Jpeg XR codec."
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake"
+    #generators = "CMakeDeps", "CMakeToolchain"
     license = "BSD 3-Clause"
-    _source_subfolder = "source_subfolder"
 
     def config_options(self):
         pass
-        # if self.settings.os == "Windows":
-        #     self.options.remove("fPIC")
 
     def source(self):
-        git = tools.Git()
-        git.clone("https://gitlab.com/bioslide/jpegxrcodec.git", "v{0}".format(self.version), args="--recursive")
+         data = self.conan_data["sources"][self.version][0]
+         print(data)
+         url = data["url"]
+         tag = data["tag"]
+         args = ["--recurse-submodules", "--depth 1", f"-b {tag}"]
+         Git(self).clone(url=url,args=args, target=".")
 
-    def _configure_cmake(self):
-        if self.settings.os == "Macos":
-            cmake = CMake(self, generator="Xcode")
-        else:
-            cmake = CMake(self)
+    def layout(self):
+        cmake_layout(self, src_folder="source_subfolder")
+
+    def export_sources(self):
+        export_conandata_patches(self)
+
+    def generate(self):
+        tc = CMakeToolchain(self)
         if self.settings.os != "Windows":
-           cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = True
-        cmake.configure()
-        return cmake
+           tc.variables['CMAKE_POSITION_INDEPENDENT_CODE'] = True
+        tc.generate()
+
 
     def build(self):
-        # ensure that bundled cmake files are not used
-        cmake = self._configure_cmake()
+        apply_conandata_patches(self)
+        cmake = CMake(self)
+        cmake.configure()
         cmake.build()
-
+    
     def package(self):
-        self.copy("jxrcodec.hpp", dst="include/jxrcodec", src="jxrcodec")
+        target_include_dir = os.path.join(self.package_folder, "include", "jxrcodec")
+        source_include_dir = os.path.join(self.source_folder, "jxrcodec")
+        copy(self, "jxrcodec.hpp", source_include_dir, target_include_dir)
+        
+        target_lib_dir = os.path.join(self.package_folder, "lib")
+        libfile = "libjxrcodec.a"
         if self.settings.os == "Windows":
-            src_folder = "bin/" + str(self.settings.build_type)
-            self.copy("jxrcodec.*", dst="lib", src=src_folder)
-        elif self.settings.os == "Macos":
-            src_folder = "bin/" + str(self.settings.build_type)
-            self.copy("libjxrcodec.a", dst="lib", src=src_folder)
-        else:
-            src_folder = str(self.settings.build_type) + "/bin"
-            self.copy("libjxrcodec.a", dst="lib", src=src_folder)
+            libfile = "jxrcodec.lib"
+            
+        lib = find_file_recursively(self.build_folder, libfile)
+        if lib:
+            lib_dir, lib_name = os.path.split(lib)
+            copy(self, lib_name, lib_dir, target_lib_dir)
+        
+        
 
     def package_info(self):
         self.cpp_info.includedirs = ["include"]
