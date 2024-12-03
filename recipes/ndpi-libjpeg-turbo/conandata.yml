@@ -1,0 +1,4 @@
+sources:
+  "2.1.2":
+    url: "https://github.com/Booritas/ndpi-libjpeg-turbo.git"
+    tag: "v2.1.2"
