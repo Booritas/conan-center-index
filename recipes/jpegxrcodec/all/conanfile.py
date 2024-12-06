@@ -18,14 +18,9 @@ def find_file_recursively(folder, filename):
 class JxrlibConan(ConanFile):
     name = "jpegxrcodec"
     url = ""
-    version = "1.0.3"
     description = "Jpeg XR codec."
     settings = "os", "compiler", "build_type", "arch"
-    #generators = "CMakeDeps", "CMakeToolchain"
     license = "BSD 3-Clause"
-
-    def config_options(self):
-        pass
 
     def source(self):
          data = self.conan_data["sources"][self.version][0]
