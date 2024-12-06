@@ -1,0 +1,9 @@
+sources:
+  "4.3.0":
+    url: "https://github.com/Booritas/ndpi-tiff/archive/refs/tags/v4.3.0.tar.gz"
+    sha256: "b3e93c48e57f0003a9f5ae67157ec8897f03e4a833d817f3f338154a5cf740b3"
+patches:
+  "4.3.0":
+    - patch_file: "patches/4.3.0-0001-cmake-dependencies.patch"
+      patch_description: "CMake: robust handling of dependencies"
+      patch_type: "conan"
