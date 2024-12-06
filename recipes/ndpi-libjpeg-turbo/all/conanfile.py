@@ -1,5 +1,5 @@
 from conan import ConanFile
-from conan.tools.files import save, load
+from conan.tools.files import save, load, rmdir, rm
 from conan.tools.gnu import AutotoolsToolchain, AutotoolsDeps
 from conan.tools.microsoft import unix_path, VCVars, is_msvc
 from conan.errors import ConanInvalidConfiguration
@@ -59,6 +59,25 @@ class LibjpegTurboConan(ConanFile):
     def export_sources(self):
         export_conandata_patches(self)
 
+    def validate(self):
+        if self.options.enable12bit and (self.options.libjpeg7_compatibility or self.options.libjpeg8_compatibility):
+            raise ConanInvalidConfiguration("12-bit samples is not allowed with libjpeg v7/v8 API/ABI")
+        if self.options.get_safe("java", False) and not self.options.shared:
+            raise ConanInvalidConfiguration("java wrapper requires shared libjpeg-turbo")
+        if is_msvc(self) and self.options.shared and str(self.settings.compiler.runtime).startswith("MT"):
+            raise ConanInvalidConfiguration("shared libjpeg-turbo can't be built with MT or MTd")
+
+    @property
+    def _is_arithmetic_encoding_enabled(self):
+        return self.options.get_safe("arithmetic_encoder", False) or \
+               self.options.libjpeg7_compatibility or self.options.libjpeg8_compatibility
+
+    @property
+    def _is_arithmetic_decoding_enabled(self):
+        return self.options.get_safe("arithmetic_decoder", False) or \
+               self.options.libjpeg7_compatibility or self.options.libjpeg8_compatibility
+
+
     def generate(self):
         tc = CMakeToolchain(self)
         if self.settings.os != "Windows":
@@ -85,39 +104,32 @@ class LibjpegTurboConan(ConanFile):
 
 
     def package(self):
-        license_path = os.path.join(self.package_folder, "licenses")
-        target_include_dir = os.path.join(self.package_folder, "include", "jxrcodec")
-        target_lib_dir = os.path.join(self.package_folder, "lib")
-        
-        os.makedirs(license_path)
-        copy(self, "LICENSE.md", src=os.path.join(self.source_folder, "src"), dst=license_path)
-        
-        cmake = self._configure_cmake()
+        copy(self, "LICENSE.md", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        copy(self, "README.ijg", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        cmake = CMake(self)
         cmake.install()
-        # remove unneeded directories
-        tools.rmdir(os.path.join(self.package_folder, "share"))
-        tools.rmdir(os.path.join(self.package_folder, "lib", "pkgconfig"))
-        tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
-        tools.rmdir(os.path.join(self.package_folder, "doc"))
+        rmdir(self, os.path.join(self.package_folder, "share"))
+        rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
+        rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
+        rmdir(self, os.path.join(self.package_folder, "doc"))
         # remove binaries and pdb files
         for pattern_to_remove in ["cjpeg*", "djpeg*", "jpegtran*", "tjbench*", "wrjpgcom*", "rdjpgcom*", "*.pdb"]:
-            tools.remove_files_by_mask(os.path.join(self.package_folder, "bin"), pattern_to_remove)
+            rm(self, pattern_to_remove, os.path.join(self.package_folder, "bin"))
 
     def package_info(self):
+        self.cpp_info.set_property("cmake_find_mode", "both")
+        self.cpp_info.set_property("cmake_module_file_name", "JPEG")
         self.cpp_info.set_property("cmake_file_name", "libjpeg-turbo")
 
         cmake_target_suffix = "-static" if not self.options.shared else ""
         lib_suffix = "-static" if is_msvc(self) and not self.options.shared else ""
 
-        self.cpp_info.components["jpeg"].set_property("cmake_target_name", "libjpeg-turbo::jpeg{}".format(cmake_target_suffix))
+        self.cpp_info.components["jpeg"].set_property("cmake_module_target_name", "JPEG::JPEG")
+        self.cpp_info.components["jpeg"].set_property("cmake_target_name", f"libjpeg-turbo::jpeg{cmake_target_suffix}")
         self.cpp_info.components["jpeg"].set_property("pkg_config_name", "libjpeg")
-        self.cpp_info.components["jpeg"].names["cmake_find_package"] = "jpeg" + cmake_target_suffix
-        self.cpp_info.components["jpeg"].names["cmake_find_package_multi"] = "jpeg" + cmake_target_suffix
-        self.cpp_info.components["jpeg"].libs = ["jpeg" + lib_suffix]
+        self.cpp_info.components["jpeg"].libs = [f"jpeg{lib_suffix}"]
 
         if self.options.get_safe("turbojpeg"):
-            self.cpp_info.components["turbojpeg"].set_property("cmake_target_name", "libjpeg-turbo::turbojpeg{}".format(cmake_target_suffix))
+            self.cpp_info.components["turbojpeg"].set_property("cmake_target_name", f"libjpeg-turbo::turbojpeg{cmake_target_suffix}")
             self.cpp_info.components["turbojpeg"].set_property("pkg_config_name", "libturbojpeg")
-            self.cpp_info.components["turbojpeg"].names["cmake_find_package"] = "turbojpeg" + cmake_target_suffix
-            self.cpp_info.components["turbojpeg"].names["cmake_find_package_multi"] = "turbojpeg" + cmake_target_suffix
-            self.cpp_info.components["turbojpeg"].libs = ["turbojpeg" + lib_suffix]
+            self.cpp_info.components["turbojpeg"].libs = [f"turbojpeg{lib_suffix}"]
