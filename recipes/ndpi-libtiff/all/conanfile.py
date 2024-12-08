@@ -10,7 +10,7 @@ required_conan_version = ">=1.53.0"
 
 
 class LibtiffConan(ConanFile):
-    name = "libtiff"
+    name = "ndpi-libtiff"
     description = "Library for Tag Image File Format (TIFF)"
     url = "https://github.com/conan-io/conan-center-index"
     license = "libtiff"

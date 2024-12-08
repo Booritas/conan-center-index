@@ -31,6 +31,7 @@ class PoleConan(ConanFile):
         tc = CMakeToolchain(self)
         if self.settings.os != "Windows":
            tc.variables['CMAKE_POSITION_INDEPENDENT_CODE'] = True
+        tc.variables['PACKAGE_TESTS'] = False
         tc.generate()
 
     def build(self):
