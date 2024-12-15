@@ -119,7 +119,7 @@ class LibtiffConan(ConanFile):
         apply_conandata_patches(self)
 
         # remove FindXXXX for conan dependencies
-        for module in ["Deflate", "JBIG", "JPEG", "LERC", "WebP", "ZSTD", "liblzma", "LibLZMA"]:
+        for module in ["Deflate", "JBIG", "NDPIJPEG", "LERC", "WebP", "ZSTD", "liblzma", "LibLZMA"]:
             rm(self, f"Find{module}.cmake", os.path.join(self.source_folder, "cmake"))
 
         # Export symbols of tiffxx for msvc shared
@@ -149,8 +149,8 @@ class LibtiffConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.set_property("cmake_find_mode", "both")
-        self.cpp_info.set_property("cmake_file_name", "TIFF")
-        self.cpp_info.set_property("cmake_target_name", "TIFF::TIFF")
+        self.cpp_info.set_property("cmake_file_name", "NDPITIFF")
+        self.cpp_info.set_property("cmake_target_name", "NDPITIFF::NDPITIFF")
         self.cpp_info.set_property("pkg_config_name", f"libtiff-{Version(self.version).major}")
         suffix = "d" if is_msvc(self) and self.settings.build_type == "Debug" else ""
         if self.options.cxx:
@@ -175,5 +175,5 @@ class LibtiffConan(ConanFile):
             self.cpp_info.requires.append("libwebp::libwebp")
 
         # TODO: to remove in conan v2 once cmake_find_package* & pkg_config generators removed
-        self.cpp_info.names["cmake_find_package"] = "TIFF"
-        self.cpp_info.names["cmake_find_package_multi"] = "TIFF"
+        # self.cpp_info.names["cmake_find_package"] = "NDPITIFF"
+        # self.cpp_info.names["cmake_find_package_multi"] = "NDPITIFF"
