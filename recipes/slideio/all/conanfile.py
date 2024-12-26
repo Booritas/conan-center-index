@@ -13,6 +13,7 @@ class Slideio(ConanFile):
     description = "SlideIO library."
     settings = "os", "compiler", "build_type", "arch"
     license = "BSD 3-Clause"
+    package_type = "shared-library"
 
     def source(self):
          data = self.conan_data["sources"][self.version][0]
