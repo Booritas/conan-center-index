@@ -23,3 +23,7 @@ patches:
     - patch_file: "patches/0002-no-versioned-soname.patch"
       patch_description: "add CMAKE_PLATFORM_NO_VERSIONED_SONAME"
       patch_type: "conan"
+  "0.7.1":
+    - patch_file: "patches/0003-no-versioned-soname.patch"
+      patch_description: "add CMAKE_PLATFORM_NO_VERSIONED_SONAME"
+      patch_type: "conan"
