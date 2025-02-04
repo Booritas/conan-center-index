@@ -2,6 +2,7 @@ import glob
 import hashlib
 import os
 import shutil
+import sys
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -167,7 +168,7 @@ class ICUConan(ConanFile):
                 tc.update_configure_args({"--host": host_triplet,
                                           "--build": build_triplet})
         else:
-            arch64 = ["x86_64", "sparcv9", "ppc64", "ppc64le", "armv8", "armv8.3", "mips64"]
+            arch64 = ["x86_64", "sparcv9", "ppc64", "ppc64le", "armv8", "armv8.3", "mips64", "s390x"]
             bits = "64" if self.settings.arch in arch64 else "32"
             tc.configure_args.append(f"--with-library-bits={bits}")
         if self.settings.os != "Windows":
@@ -235,8 +236,9 @@ class ICUConan(ConanFile):
     @property
     def _data_filename(self):
         vtag = Version(self.version).major
-        return f"icudt{vtag}l.dat"
-
+        suffix = "b" if sys.byteorder == "big" else "l"
+        return f"icudt{vtag}{suffix}.dat"
+    
     @property
     def _data_path(self):
         data_dir_name = "icu"
