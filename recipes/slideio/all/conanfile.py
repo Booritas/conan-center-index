@@ -9,7 +9,6 @@ import os
 class Slideio(ConanFile):
     name = "slideio"
     url = ""
-    version = "2.7.0"
     description = "SlideIO library."
     settings = "os", "compiler", "build_type", "arch"
     license = "BSD 3-Clause"
