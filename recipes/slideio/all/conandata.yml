@@ -2,3 +2,6 @@ sources:
   "2.7.0":
     - url: "https://github.com/Booritas/slideio.git"
       tag: "v2.7.0"
+  "2.7.0":
+    - url: "https://github.com/Booritas/slideio.git"
+      tag: "v2.7.1"
