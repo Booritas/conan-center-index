@@ -1,0 +1,24 @@
+--- a/dcmjpeg/libsrc/djcodecd.cc
++++ b/dcmjpeg/libsrc/djcodecd.cc
+@@ -540,7 +540,7 @@ OFCondition DJCodecDecoder::decodeFame(
+                   if (result.good())
+                   {
+                     // decompression is complete, finally adjust byte order if necessary
+-                    if (jpeg->bytesPerSample() == 1) // we're writing bytes into words
++                    if (jpeg->bytesPerSample() > 1) // we're writing bytes into words
+                     {
+                       result = swapIfNecessary(gLocalByteOrder, EBO_LittleEndian, OFreinterpret_cast(Uint16*, buffer), OFstatic_cast(Uint32, frameSize), sizeof(Uint16));
+                     }
+diff --git a/dcmjpls/libsrc/djcodecd.cc b/dcmjpls/libsrc/djcodecd.cc
+index e04a21e0d..09bd2f524 100644
+--- a/dcmjpls/libsrc/djcodecd.cc
++++ b/dcmjpls/libsrc/djcodecd.cc
+@@ -460,7 +460,7 @@ OFCondition DJLSDecoderBase::decodeFrame(
+       if (result.good())
+       {
+           // decompression is complete, finally adjust byte order if necessary
+-          if (bytesPerSample == 1) // we're writing bytes into words
++          if (bytesPerSample > 1) // we're writing bytes into words
+           {
+               result = swapIfNecessary(gLocalByteOrder, EBO_LittleEndian, buffer,
+                       bufSize, sizeof(Uint16));
