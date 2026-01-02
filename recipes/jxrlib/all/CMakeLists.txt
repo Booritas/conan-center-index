@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.15)
 project(jxrlib LANGUAGES C)
 
 include(GNUInstallDirs)
@@ -6,6 +6,11 @@ include(TestBigEndian)
 
 if(NOT MSVC)
     add_definitions(-D__ANSI__)
+endif()
+
+# Disable incompatible pointer errors for GCC and Clang
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wno-error=incompatible-pointer-types)
 endif()
 
 test_big_endian(ISBIGENDIAN)
