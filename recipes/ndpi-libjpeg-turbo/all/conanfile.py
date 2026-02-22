@@ -134,3 +134,8 @@ class LibjpegTurboConan(ConanFile):
             self.cpp_info.components["turbojpeg"].set_property("cmake_target_name", f"libjpeg-turbo::turbojpeg{cmake_target_suffix}")
             self.cpp_info.components["turbojpeg"].set_property("pkg_config_name", "libturbojpeg")
             self.cpp_info.components["turbojpeg"].libs = [f"turbojpeg{lib_suffix}"]
+            
+        if self.settings.os == "Linux":
+            self.cpp_info.components["jpeg"].libdirs = ["lib64"]
+            if self.options.get_safe("turbojpeg"):
+                self.cpp_info.components["turbojpeg"].libdirs = ["lib64"]
