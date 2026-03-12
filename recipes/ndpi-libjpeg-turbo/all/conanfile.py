@@ -80,6 +80,7 @@ class LibjpegTurboConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
+        tc.variables["CMAKE_INSTALL_LIBDIR"] = "lib"
         if self.settings.os != "Windows":
            tc.variables['CMAKE_POSITION_INDEPENDENT_CODE'] = True
         tc.variables["CONAN_DISABLE_CHECK_COMPILER"] = True
@@ -111,6 +112,8 @@ class LibjpegTurboConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "share"))
         rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
+        rmdir(self, os.path.join(self.package_folder, "lib64", "pkgconfig"))
+        rmdir(self, os.path.join(self.package_folder, "lib64", "cmake"))
         rmdir(self, os.path.join(self.package_folder, "doc"))
         # remove binaries and pdb files
         for pattern_to_remove in ["cjpeg*", "djpeg*", "jpegtran*", "tjbench*", "wrjpgcom*", "rdjpgcom*", "*.pdb"]:
@@ -134,8 +137,3 @@ class LibjpegTurboConan(ConanFile):
             self.cpp_info.components["turbojpeg"].set_property("cmake_target_name", f"libjpeg-turbo::turbojpeg{cmake_target_suffix}")
             self.cpp_info.components["turbojpeg"].set_property("pkg_config_name", "libturbojpeg")
             self.cpp_info.components["turbojpeg"].libs = [f"turbojpeg{lib_suffix}"]
-            
-        if self.settings.os == "Linux":
-            self.cpp_info.components["jpeg"].libdirs = ["lib64"]
-            if self.options.get_safe("turbojpeg"):
-                self.cpp_info.components["turbojpeg"].libdirs = ["lib64"]

@@ -88,6 +88,7 @@ class LibtiffConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
+        tc.variables["CMAKE_INSTALL_LIBDIR"] = "lib"
         tc.variables["lzma"] = self.options.lzma
         tc.variables["jpeg12"] = False
         tc.variables["jbig"] = self.options.jbig
@@ -146,6 +147,8 @@ class LibtiffConan(ConanFile):
         cmake.install()
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
         rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
+        rmdir(self, os.path.join(self.package_folder, "lib64", "cmake"))
+        rmdir(self, os.path.join(self.package_folder, "lib64", "pkgconfig"))
 
     def package_info(self):
         self.cpp_info.set_property("cmake_find_mode", "both")
