@@ -48,7 +48,10 @@ class Slideio(ConanFile):
         if os_name == "Macos":
             os_dir = "OSX"
         build_type = str(self.settings.build_type)
-        install_folder = os.path.join(self.build_folder, "install")
+        configuration = 'release'
+        if self.settings.build_type == 'Debug':
+            configuration = 'debug'
+        install_folder = os.path.join(self.build_folder, "install", configuration)
         print(f"install_folder: {install_folder}")
         copy(self, "*.hpp", src=os.path.join(install_folder,"include"), dst=os.path.join(self.package_folder,"include"))
         lib_pattern = "*.lib"
