@@ -2,3 +2,6 @@ sources:
   "1.0.4":
     - url: "https://github.com/Booritas/pole.git"
       tag: "v1.0.4"
+  "1.0.5":
+    - url: "https://github.com/Booritas/pole.git"
+      tag: "v1.0.5"
