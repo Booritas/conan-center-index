@@ -29,3 +29,6 @@ sources:
   "2.9.2":
     - url: "https://github.com/Booritas/slideio.git"
       tag: "v2.9.0"
+  "2.9.3":
+    - url: "https://github.com/Booritas/slideio.git"
+      tag: "v2.9.0"
